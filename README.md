@@ -1,4 +1,4 @@
-# 🗂️ TaskFlow
+# 📂 TaskFlow
 
 ### *A Production-Grade, Secure Full-Stack Task Management Application*
 
@@ -15,24 +15,24 @@
 TaskFlow is a production-ready task management system designed to handle real-world workflows. Moving beyond a simple CRUD tutorial, this application implements a **hardened backend architecture**, **dual-token JWT authentication**, and **end-to-end type safety**. It addresses the core needs of secure personal task management with a focus on performance, data integrity, and clean UX.
 
 </div>
-<br/>
-[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
-&nbsp;
-[![TypeScript](https://img.shields.io/badge/TypeScript-Full%20Stack-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
-&nbsp;
-[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org/)
-
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma%20ORM-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-&nbsp;
-[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
-&nbsp;
-[![Zod](https://img.shields.io/badge/Zod-Validation-3068B7?style=for-the-badge&logo=zod&logoColor=white)](https://zod.dev/)
-&nbsp;
-[![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com)
 
 <br/>
 
-> **Built to impress. Engineered to scale. Designed to ship.**
+<div align="center">
+
+[![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=flat-square&logo=next.js&logoColor=white)](https://nextjs.org/)
+&nbsp;
+[![TypeScript](https://img.shields.io/badge/TypeScript-Full%20Stack-3178C6?style=flat-square&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+&nbsp;
+[![Node.js](https://img.shields.io/badge/Node.js-Express-339933?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+&nbsp;
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-Prisma%20ORM-336791?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+&nbsp;
+[![JWT](https://img.shields.io/badge/JWT-Auth-000000?style=flat-square&logo=jsonwebtokens&logoColor=white)](https://jwt.io/)
+&nbsp;
+[![Zod](https://img.shields.io/badge/Zod-Validation-3068B7?style=flat-square&logo=zod&logoColor=white)](https://zod.dev/)
+&nbsp;
+[![Render](https://img.shields.io/badge/Deployed-Render-46E3B7?style=flat-square&logo=render&logoColor=white)](https://render.com)
 
 </div>
 
