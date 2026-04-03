@@ -1,10 +1,11 @@
 # 📂 TaskFlow
 
+<div align="center">
 ### *A Production-Grade, Secure Full-Stack Task Management Application*
 
 <br/>
 
-<div align="center">
+
 
 [![Live Demo](https://img.shields.io/badge/🚀%20LIVE%20DEMO-VISIT%20APP%20NOW-4CAF50?style=for-the-badge&logo=rocket&logoColor=white)](https://task-manage-app-frontend.onrender.com)
 
@@ -12,7 +13,8 @@
 
 **Built to impress. Engineered to scale. Designed to ship.**
 
-TaskFlow is a production-ready task management system designed to handle real-world workflows. Moving beyond a simple CRUD tutorial, this application implements a **hardened backend architecture**, **dual-token JWT authentication**, and **end-to-end type safety**. It addresses the core needs of secure personal task management with a focus on performance, data integrity, and clean UX.
+**TaskFlow** is a production-ready, full-stack task management system built end-to-end with modern technologies. It solves a real-world problem: **managing personal tasks securely, with clean UX and a hardened backend** — not just a tutorial CRUD app, but a deployment-ready system with authentication, validation, error handling, and real-time analytics.
+
 
 </div>
 
@@ -66,12 +68,6 @@ TaskFlow is a production-ready task management system designed to handle real-wo
 <sub>📋 Full CRUD · Real-time stats · Filter by status · Search by title · Pagination</sub>
 
 </div>
-
----
-
-## 🎯 What Is TaskFlow?
-
-**TaskFlow** is a production-ready, full-stack task management system built end-to-end with modern technologies. It solves a real-world problem: **managing personal tasks securely, with clean UX and a hardened backend** — not just a tutorial CRUD app, but a deployment-ready system with authentication, validation, error handling, and real-time analytics.
 
 ---
 
@@ -372,9 +368,5 @@ Both services are independently deployed with environment secrets managed via Re
 
 *This project demonstrates real-world full-stack engineering:*
 *secure authentication · production error handling · scalable REST architecture · clean TypeScript code*
-
-<br/>
-
-**⭐ If this project impressed you, please star the repo!**
 
 </div>
