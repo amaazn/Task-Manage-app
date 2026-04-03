@@ -139,31 +139,73 @@ export default function RegisterPage() {
 
   const [loading, setLoading] = useState(false);
 
-  const handleRegister = async (e: any) => {
-    e.preventDefault();
+//   const handleRegister = async (e: any) => {
+//     e.preventDefault();
 
+//     try {
+//       setLoading(true);
+
+//       const res = await registerUser({
+//         name,
+//         email,
+//         password
+//       });
+
+//       saveAuth(res.accessToken, name);
+
+//       toast.success("Account created successfully");
+
+//       router.push("/dashboard");
+
+//     } catch (error: any) {
+//       toast.error(error.response?.data?.message || "Registration failed");
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
     try {
       setLoading(true);
+      // Call the register service
+      const res: any = await registerUser({ name, email, password });
 
-      const res = await registerUser({
-        name,
-        email,
-        password
-      });
-
-      saveAuth(res.accessToken, name);
-
-      toast.success("Account created successfully");
-
+      toast.success("Account created! Redirecting...");
+      
+      // Save credentials and move to dashboard
+      saveAuth(res.accessToken, res.user.name);
       router.push("/dashboard");
 
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Registration failed");
+      console.error("Registration error:", error);
+
+      // 1. Get the data sent by the backend
+      const errorData = error.response?.data;
+
+      let displayMessage = "Registration failed. Please try again.";
+
+      // 2. LOGIC: If it's a Zod array (like the one in your screenshot)
+      if (Array.isArray(errorData) && errorData.length > 0) {
+        // Take the human-readable 'message' from the first error in the list
+        displayMessage = errorData[0].message; 
+      } 
+      // 3. LOGIC: If it's a single error object with a .message property
+      else if (errorData?.message) {
+        displayMessage = errorData.message;
+      }
+      // 4. LOGIC: If it's a string directly
+      else if (typeof errorData === "string") {
+        displayMessage = errorData;
+      }
+
+      // SHOW THE CLEAN TOAST
+      toast.error(displayMessage);
+
     } finally {
       setLoading(false);
     }
   };
-
   return (
     <div className="flex min-h-screen bg-[#FAFAFA] relative font-sans">
       
