@@ -15,61 +15,26 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
 
-//   const handleLogin = async (e: React.FormEvent) => {
-//     e.preventDefault();
-    
-//     try {
-//       setLoading(true);
-//       const res = await loginUser({ email, password });
-
-//       // Safety check: Fallback to "User" if name is missing from backend
-//       const userName = res.user?.name || res.name || "User";
-//       const token = res.accessToken;
-
-//       if (!token) {
-//         throw new Error("No access token received");
-//       }
-
-//       // Save credentials to localStorage
-//       saveAuth(token, userName);
-
-//       toast.success("Welcome back!");
-      
-//       // Navigate to dashboard
-//       router.push("/dashboard");
-      
-//       // Delay refresh slightly to ensure navigation starts
-//       setTimeout(() => {
-//         router.refresh();
-//       }, 100);
-
-//     } catch (error: any) {
-//       console.error("Login error details:", error);
-//       const errorMsg = error.response?.data?.message || "Invalid email or password";
-//       toast.error(errorMsg);
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       setLoading(true);
-      // ADDED ': any' HERE TO BYPASS THE BUILD ERROR
+      // We use : any to ensure we can read the properties without TS errors
       const res: any = await loginUser({ email, password });
 
-      // These lines will now pass the build check
+      // 1. EXTRACTION: Check every possible place the token and name could be
+      const token = res.accessToken || res.token || (res.data && res.data.accessToken);
       const userName = res.user?.name || res.name || "User";
-      const token = res.accessToken || res.token; // Added fallback just in case
 
       if (!token) {
-        throw new Error("No access token received");
+        throw new Error("No access token received from server");
       }
 
+      // 2. SAVE & REDIRECT
       saveAuth(token, userName);
-      toast.success("Welcome back!");
+      toast.success(`Welcome back, ${userName}!`);
+      
       router.push("/dashboard");
       
       setTimeout(() => {
@@ -78,8 +43,22 @@ const handleLogin = async (e: React.FormEvent) => {
 
     } catch (error: any) {
       console.error("Login error details:", error);
-      const errorMsg = error.response?.data?.message || "Invalid email or password";
-      toast.error(errorMsg);
+
+      // --- THE FIX FOR THE JSON BOX ---
+      const errorData = error.response?.data;
+      let finalMsg = "Invalid email or password";
+
+      if (Array.isArray(errorData) && errorData.length > 0) {
+        // If it's the Zod Array list, grab the first text message
+        finalMsg = errorData[0].message;
+      } else if (errorData?.message) {
+        // If it's a simple error object
+        finalMsg = errorData.message;
+      }
+
+      // This will show ONLY the clean text in the toast
+      toast.error(finalMsg);
+
     } finally {
       setLoading(false);
     }
@@ -88,9 +67,7 @@ const handleLogin = async (e: React.FormEvent) => {
   return (
     <div className="flex min-h-screen bg-[#FAFAFA] relative font-sans overflow-hidden">
       <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
-      <div className="absolute inset-0 bg-gradient-to-t from-[#FAFAFA] via-transparent to-transparent pointer-events-none" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[400px] bg-gray-300/30 rounded-full blur-[100px] pointer-events-none" />
-
+      
       <Sidebar />
 
       <div className="flex flex-1 items-center justify-center p-6 z-10">
@@ -109,27 +86,25 @@ const handleLogin = async (e: React.FormEvent) => {
               type="email"
               placeholder="Email address"
               required
-              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all duration-200"
+              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all"
             />
 
             <input
               type="password"
               placeholder="Password"
               required
-              autoComplete="current-password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all duration-200"
+              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all"
             />
 
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-gray-800 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3)] active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
+                className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-gray-800 transition-all disabled:opacity-70"
               >
                 {loading ? "Logging in..." : "Login"}
               </button>
@@ -138,7 +113,7 @@ const handleLogin = async (e: React.FormEvent) => {
 
           <p className="text-center text-gray-500 text-sm mt-8 font-medium">
             Don't have an account?{" "}
-            <Link href="/register" className="text-gray-900 font-semibold cursor-pointer hover:underline underline-offset-4 decoration-gray-300 transition-all">
+            <Link href="/register" className="text-gray-900 font-semibold hover:underline">
               Register
             </Link>
           </p>

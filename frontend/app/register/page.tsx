@@ -1,134 +1,12 @@
-// "use client";
-
-// import { useState } from "react";
-// import Sidebar from "@/components/Sidebar";
-// import { registerUser } from "@/services/authService";
-// import { saveAuth } from "@/utils/auth";
-// import toast from "react-hot-toast";
-// import { useRouter } from "next/navigation";
-
-// export default function RegisterPage() {
-//   const router = useRouter();
-
-//   const [name, setName] = useState("");
-//   const [email, setEmail] = useState("");
-//   const [password, setPassword] = useState("");
-
-//   const [loading, setLoading] = useState(false);
-
-//   const handleRegister = async (e: any) => {
-//     e.preventDefault();
-
-//     try {
-//       setLoading(true);
-
-//       const res = await registerUser({
-//         name,
-//         email,
-//         password
-//       });
-
-//       saveAuth(res.accessToken);
-
-//       toast.success("Account created successfully");
-
-//       router.push("/dashboard");
-
-//     } catch (error: any) {
-
-//       toast.error(error.response?.data?.message || "Registration failed");
-
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-
-//   return (
-//     <div className="flex min-h-screen">
-
-//       <Sidebar />
-
-//       <div className="flex flex-1 items-center justify-center bg-gradient-to-br from-blue-50 via-white to-indigo-100">
-
-//         <div className="w-full max-w-md bg-white/80 backdrop-blur-md shadow-xl rounded-2xl p-8 border border-gray-200">
-
-//           <h1 className="text-3xl font-bold text-gray-800 mb-6 text-center">
-//             Create Account
-//           </h1>
-
-//           <p className="text-gray-500 text-center mb-8">
-//             Start managing your tasks today
-//           </p>
-
-//           <form onSubmit={handleRegister} className="space-y-5">
-
-//             <input
-//               type="text"
-//               placeholder="Full Name"
-//               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-//               value={name}
-//               onChange={(e) => setName(e.target.value)}
-//               required
-//             />
-
-//             <input
-//               type="email"
-//               placeholder="Email address"
-//               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-//               value={email}
-//               onChange={(e) => setEmail(e.target.value)}
-//               required
-//             />
-
-//             <input
-//               type="password"
-//               placeholder="Password"
-//               className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-400"
-//               value={password}
-//               onChange={(e) => setPassword(e.target.value)}
-//               required
-//             />
-
-//             <button
-//               type="submit"
-//               disabled={loading}
-//               className="w-full bg-blue-600 hover:bg-blue-700 transition text-white font-semibold py-3 rounded-lg shadow-md"
-//             >
-//               {loading ? "Creating account..." : "Register"}
-//             </button>
-
-//           </form>
-
-//           <p className="text-center text-gray-600 mt-6">
-
-//             Already have an account?{" "}
-
-//             <a
-//               href="/login"
-//               className="text-blue-600 hover:underline font-medium"
-//             >
-//               Login
-//             </a>
-
-//           </p>
-
-//         </div>
-
-//       </div>
-
-//     </div>
-//   );
-// }
-
-
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import Sidebar from "@/components/Sidebar";
 import { registerUser } from "@/services/authService";
 import { saveAuth } from "@/utils/auth";
 import toast from "react-hot-toast";
-import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const router = useRouter();
@@ -136,148 +14,122 @@ export default function RegisterPage() {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
   const [loading, setLoading] = useState(false);
 
-//   const handleRegister = async (e: any) => {
-//     e.preventDefault();
-
-//     try {
-//       setLoading(true);
-
-//       const res = await registerUser({
-//         name,
-//         email,
-//         password
-//       });
-
-//       saveAuth(res.accessToken, name);
-
-//       toast.success("Account created successfully");
-
-//       router.push("/dashboard");
-
-//     } catch (error: any) {
-//       toast.error(error.response?.data?.message || "Registration failed");
-//     } finally {
-//       setLoading(false);
-//     }
-//   };
-const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     
     try {
       setLoading(true);
-      // Call the register service
+      // 'as any' prevents TypeScript from being a pain during the build
       const res: any = await registerUser({ name, email, password });
 
-      toast.success("Account created! Redirecting...");
-      
-      // Save credentials and move to dashboard
-      saveAuth(res.accessToken, res.user.name);
-      router.push("/dashboard");
+      const token = res.accessToken || res.token || (res.data && res.data.accessToken);
+      const displayName = res.user?.name || res.name || name || "User";
+
+      if (token) {
+        saveAuth(token, displayName);
+        toast.success("Account created! Welcome to TaskFlow.");
+        router.push("/dashboard");
+      } else {
+        toast.success("Registration successful! Please login.");
+        router.push("/login");
+      }
 
     } catch (error: any) {
-      console.error("Registration error:", error);
-
-      // 1. Get the data sent by the backend
+      // --- THE NUCLEAR ERROR CLEANER ---
       const errorData = error.response?.data;
+      let finalMessage = "Registration failed";
 
-      let displayMessage = "Registration failed. Please try again.";
-
-      // 2. LOGIC: If it's a Zod array (like the one in your screenshot)
+      // 1. If it's the Zod Array list we see in your screenshot: [ { message: "..." } ]
       if (Array.isArray(errorData) && errorData.length > 0) {
-        // Take the human-readable 'message' from the first error in the list
-        displayMessage = errorData[0].message; 
+        // We grab ONLY the 'message' property from the first item
+        finalMessage = errorData[0].message; 
       } 
-      // 3. LOGIC: If it's a single error object with a .message property
-      else if (errorData?.message) {
-        displayMessage = errorData.message;
+      // 2. If it's a simple error object: { message: "..." }
+      else if (errorData && typeof errorData === 'object' && errorData.message) {
+        finalMessage = errorData.message;
       }
-      // 4. LOGIC: If it's a string directly
+      // 3. If the backend just sent a raw string
       else if (typeof errorData === "string") {
-        displayMessage = errorData;
+        finalMessage = errorData;
+      }
+      // 4. Fallback if the above fails
+      else {
+        finalMessage = error.message || "An unexpected error occurred";
       }
 
-      // SHOW THE CLEAN TOAST
-      toast.error(displayMessage);
+      // We use String() to be 100% sure we are passing text, not an object
+      toast.error(String(finalMessage));
+      
+      // Keep this for your terminal so you can see if the structure changes
+      console.log("CLEANED MESSAGE:", finalMessage);
 
     } finally {
       setLoading(false);
     }
   };
-  return (
-    <div className="flex min-h-screen bg-[#FAFAFA] relative font-sans">
-      
-      {/* Subtle Grid Background matching the reference image */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:32px_32px] pointer-events-none" />
 
+  return (
+    <div className="flex min-h-screen bg-[#FAFAFA] relative font-sans overflow-hidden">
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] pointer-events-none" />
+      
       <Sidebar />
 
       <div className="flex flex-1 items-center justify-center p-6 z-10">
-        
-        {/* Premium White Card */}
-        <div className="w-full max-w-[420px] bg-white rounded-3xl p-10 shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)] border border-gray-100">
-          
-          <h1 className="text-[26px] font-bold text-[#0f172a] mb-2 text-center tracking-tight">
+        <div className="w-full max-w-[400px] bg-white rounded-[1.5rem] p-10 shadow-[0_0_0_1px_rgba(0,0,0,0.04),0_8px_16px_-4px_rgba(0,0,0,0.05),0_24px_32px_-8px_rgba(0,0,0,0.05)]">
+          <h1 className="text-[28px] font-bold text-gray-900 tracking-tight mb-2 text-center">
             Create Your Account 🎉
           </h1>
-          
-          <p className="text-[#64748b] text-sm text-center mb-8">
+          <p className="text-gray-500 text-sm text-center mb-8 font-medium">
             Sign up to start managing your tasks
           </p>
 
           <form onSubmit={handleRegister} className="space-y-4">
-            
             <input
               type="text"
               placeholder="Full Name"
-              className="w-full px-4 py-3.5 bg-transparent border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+              required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              required
+              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all duration-200"
             />
 
             <input
               type="email"
               placeholder="Email address"
-              className="w-full px-4 py-3.5 bg-transparent border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+              required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              required
+              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all duration-200"
             />
 
             <input
               type="password"
               placeholder="Password"
-              className="w-full px-4 py-3.5 bg-transparent border border-gray-200 rounded-xl text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-gray-400 focus:ring-1 focus:ring-gray-400 transition-colors"
+              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              required
+              className="w-full px-4 py-3.5 bg-gray-50/50 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-4 focus:ring-gray-900/5 focus:border-gray-900 focus:bg-white transition-all duration-200"
             />
 
             <div className="pt-2">
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full py-3.5 bg-[#0f172a] text-white rounded-xl font-medium text-sm hover:bg-[#1e293b] active:scale-[0.98] disabled:opacity-70 disabled:pointer-events-none transition-all"
+                className="w-full py-3.5 bg-gray-900 text-white rounded-xl font-medium text-sm hover:bg-gray-800 hover:-translate-y-0.5 hover:shadow-[0_8px_20px_-6px_rgba(0,0,0,0.3)] active:scale-[0.98] transition-all duration-200 disabled:opacity-70 disabled:cursor-not-allowed"
               >
-                {loading ? "Creating account..." : "Register"}
+                {loading ? "Registering..." : "Register"}
               </button>
             </div>
-
           </form>
 
-          <p className="text-center text-[#64748b] text-sm mt-8">
+          <p className="text-center text-gray-500 text-sm mt-8 font-medium">
             Already have an account?{" "}
-            <a
-              href="/login"
-              className="text-[#0f172a] font-semibold hover:underline"
-            >
+            <Link href="/login" className="text-gray-900 font-semibold cursor-pointer hover:underline underline-offset-4 transition-all">
               Login
-            </a>
+            </Link>
           </p>
-
         </div>
       </div>
     </div>
