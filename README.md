@@ -64,8 +64,6 @@
 
 **TaskFlow** is a production-ready, full-stack task management system built end-to-end with modern technologies. It solves a real-world problem: **managing personal tasks securely, with clean UX and a hardened backend** — not just a tutorial CRUD app, but a deployment-ready system with authentication, validation, error handling, and real-time analytics.
 
-> 💡 **Core Engineering Challenge:** Standard error handlers fail when Zod returns nested validation arrays. We engineered a **custom recursive "JSON-Killer" error parser** that walks the entire Zod error tree and transforms it into human-readable, single-line toast notifications — the kind of detail that separates production apps from hobby projects.
-
 ---
 
 ## ⚡ Tech Stack
@@ -140,15 +138,13 @@
              │ Match
              ▼
   ┌──────────────────────────────────────────┐
-  │  Issue Access Token  (short-lived ~15m)  │
-  │  Issue Refresh Token (long-lived  ~7d)   │
+  │  Issue JWT Access Token  (~3h lifetime)  │
   └──────────────────────┬───────────────────┘
                          │
                          ▼
-  Frontend stores tokens → Axios interceptor
+  Frontend stores token → Axios interceptor
   auto-attaches to every request header →
-  On 401, interceptor silently calls /auth/refresh
-  → New Access Token issued → User stays logged in ♻️
+  On expiry, user is redirected to login 🔄
 ```
 
 ---
@@ -159,9 +155,8 @@
 
 | Method | Endpoint | Description | Auth Required |
 |--------|----------|-------------|:---:|
-| `POST` | `/auth/register` | Create account, hash password, issue JWT pair | ❌ |
-| `POST` | `/auth/login` | Authenticate user, issue JWT pair | ❌ |
-| `POST` | `/auth/refresh` | Get new Access Token via Refresh Token | ❌ |
+| `POST` | `/auth/register` | Create account, hash password, issue JWT | ❌ |
+| `POST` | `/auth/login` | Authenticate user, issue JWT | ❌ |
 | `POST` | `/auth/logout` | Invalidate session | ✅ |
 
 ### 📋 Tasks — `/tasks`
@@ -179,42 +174,17 @@
 
 ---
 
-## 🧠 The Custom Zod Error Parser — "JSON-Killer"
-
-Standard error handlers can't handle nested Zod arrays gracefully. Here's the problem:
-
-```json
-// ❌ Raw Zod output — unusable in a UI
-{
-  "issues": [
-    { "code": "too_small", "path": ["password"], "message": "Min 5 chars" },
-    { "code": "invalid_string", "path": ["email"], "message": "Invalid email" }
-  ]
-}
-```
-
-Our custom recursive parser fixes this:
-
-```typescript
-// ✅ Our parser output — displayed directly as a Toast
-"Password must be at least 5 characters. Invalid email address."
-```
-
-The parser recursively **walks the error tree**, collects all leaf messages, deduplicates them, and joins them into one clean string — which React Hot Toast then displays instantly. This is real production engineering, not tutorial code.
-
----
-
 ## ✨ Features at a Glance
 
 | Feature | Details |
 |---|---|
-| 🔒 **JWT Authentication** | Register · Login · Logout · Silent token refresh |
+| 🔒 **JWT Authentication** | Register · Login · Logout · Token-secured routes |
 | 📋 **Full CRUD** | Create · Read · Update · Delete · Toggle tasks |
 | 🔍 **Smart Filtering** | Filter by status (Todo/Done), search by title |
 | 📊 **Real-time Analytics** | Total · Completed · Pending · Progress % bar |
 | 📄 **Pagination** | Tasks loaded in batches, navigable pages |
 | 📱 **Fully Responsive** | Mobile-first, fluid layout across all screen sizes |
-| 🍞 **Smart Toasts** | Custom Zod error parser → clean user notifications |
+| 🍞 **Smart Toasts** | Instant success/error notifications via React Hot Toast |
 | 🔷 **TypeScript E2E** | Type safety from DB schema to UI components |
 | ✅ **Zod Validation** | Every input validated before touching the database |
 | 🚀 **Deployed on Render** | Live, publicly accessible — not just localhost |
@@ -225,28 +195,21 @@ The parser recursively **walks the error tree**, collects all leaf messages, ded
 
 ```prisma
 model User {
-  id           String   @id @default(cuid())
-  name         String
-  email        String   @unique
-  passwordHash String
-  tasks        Task[]
-  createdAt    DateTime @default(now())
+  id       Int    @id @default(autoincrement())
+  name     String
+  email    String @unique
+  password String
+  tasks    Task[]
 }
 
 model Task {
-  id          String   @id @default(cuid())
+  id          Int      @id @default(autoincrement())
   title       String
   description String?
-  status      Status   @default(TODO)
-  userId      String
-  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  completed   Boolean  @default(false)
+  userId      Int
+  user        User     @relation(fields: [userId], references: [id])
   createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-}
-
-enum Status {
-  TODO
-  DONE
 }
 ```
 
@@ -257,38 +220,65 @@ enum Status {
 ```
 Task-Manage-app/
 ├── 📂 Backend/
+│   ├── 📂 prisma/
+│   │   ├── 📂 migrations/
+│   │   └── schema.prisma                # DB models: User & Task
 │   ├── 📂 src/
 │   │   ├── 📂 controllers/
-│   │   │   ├── auth.controller.ts       # Register · Login · Refresh · Logout
+│   │   │   ├── auth.controller.ts       # Register · Login · Logout logic
 │   │   │   └── task.controller.ts       # Full CRUD + Toggle logic
-│   │   ├── 📂 middlewares/
-│   │   │   ├── auth.middleware.ts       # JWT guard — protects private routes
-│   │   │   └── validate.middleware.ts   # Zod schema validation layer
+│   │   ├── 📂 generated/prisma          # Auto-generated Prisma client
+│   │   │   ├── 📂 internal/
+│   │   │   ├── 📂 models/
+│   │   │   ├── browser.ts
+│   │   │   ├── client.ts
+│   │   │   ├── commonInputTypes.ts
+│   │   │   ├── enums.ts
+│   │   │   └── models.ts
+│   │   ├── 📂 middleware/
+│   │   │   └── auth.middleware.ts       # JWT guard — protects private routes
 │   │   ├── 📂 routes/
 │   │   │   ├── auth.routes.ts
 │   │   │   └── task.routes.ts
-│   │   ├── 📂 schemas/
-│   │   │   ├── auth.schema.ts           # Zod: email, password rules
-│   │   │   └── task.schema.ts           # Zod: title, description, status
-│   │   └── app.ts
-│   ├── 📂 prisma/
-│   │   └── schema.prisma                # DB models: User & Task
-│   └── package.json
+│   │   ├── 📂 utils/
+│   │   │   ├── jwt.ts                   # JWT sign/verify helpers
+│   │   │   └── prisma.ts                # Prisma client instance
+│   │   ├── 📂 validators/               # Zod schema validators
+│   │   ├── app.ts
+│   │   └── server.ts
+│   ├── .env
+│   ├── .gitignore
+│   ├── package.json
+│   ├── prisma.config.ts
+│   └── tsconfig.json
 │
 ├── 📂 frontend/
 │   ├── 📂 app/
-│   │   ├── 📂 (auth)/
-│   │   │   ├── login/page.tsx           # Login page
-│   │   │   └── register/page.tsx        # Registration page
-│   │   └── 📂 dashboard/
-│   │       └── page.tsx                 # Main task dashboard
+│   │   ├── 📂 dashboard/
+│   │   │   └── page.tsx                 # Main task dashboard
+│   │   ├── 📂 login/
+│   │   │   └── page.tsx                 # Login page
+│   │   ├── 📂 register/
+│   │   │   └── page.tsx                 # Registration page
+│   │   ├── favicon.ico
+│   │   ├── globals.css
+│   │   ├── layout.tsx
+│   │   └── page.tsx
 │   ├── 📂 components/
+│   │   ├── Sidebar.tsx
 │   │   ├── TaskCard.tsx
-│   │   ├── NewTaskModal.tsx
-│   │   └── StatsBar.tsx
-│   ├── 📂 lib/
-│   │   ├── axios.ts                     # Axios instance + auth interceptors
-│   │   └── errorParser.ts              # 🔑 Custom recursive Zod error parser
+│   │   └── TaskModal.tsx
+│   ├── 📂 services/
+│   │   ├── api.ts                       # Axios instance + interceptors
+│   │   ├── authService.ts               # Register/Login/Logout calls
+│   │   └── taskService.ts               # CRUD API calls
+│   ├── 📂 types/
+│   │   ├── auth.ts
+│   │   └── task.ts
+│   ├── 📂 utils/
+│   │   └── auth.ts
+│   ├── .env.local
+│   ├── next.config.ts
 │   └── package.json
 │
 └── README.md
@@ -319,9 +309,8 @@ cd Backend && npm install
 Create `Backend/.env`:
 ```env
 DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE"
-JWT_ACCESS_SECRET="your_access_secret"
-JWT_REFRESH_SECRET="your_refresh_secret"
 PORT=5000
+JWT_SECRET="your_jwt_secret"
 ```
 
 ```bash
