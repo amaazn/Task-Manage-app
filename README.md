@@ -1,5 +1,3 @@
-<img width="1898" height="1011" alt="register" src="https://github.com/user-attachments/assets/b767be96-0b0c-4937-af65-2514767f8ffd" /><div align="center">
-
 # 🗂️ TaskFlow
 
 ### *A Production-Grade, Secure Full-Stack Task Management Application*
