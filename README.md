@@ -1,17 +1,15 @@
 # 📂 TaskFlow
 
-<div align="center">
 ### *A Production-Grade, Secure Full-Stack Task Management Application*
+<p align="center"><strong><em>A Production-Grade, Secure Full-Stack Task Management Application</em></strong></p>
 
 <br/>
-
+<div align="center">
 
 
 [![Live Demo](https://img.shields.io/badge/🚀%20LIVE%20DEMO-VISIT%20APP%20NOW-4CAF50?style=for-the-badge&logo=rocket&logoColor=white)](https://task-manage-app-frontend.onrender.com)
 
 <br/>
-
-**Built to impress. Engineered to scale. Designed to ship.**
 
 **TaskFlow** is a production-ready, full-stack task management system built end-to-end with modern technologies. It solves a real-world problem: **managing personal tasks securely, with clean UX and a hardened backend** — not just a tutorial CRUD app, but a deployment-ready system with authentication, validation, error handling, and real-time analytics.
 
