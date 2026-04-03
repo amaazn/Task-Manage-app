@@ -12,7 +12,7 @@ const app = express();
 // automatically for all routes, so we don't need app.options anymore.
 const corsOptions = {
   origin: ["http://localhost:3000",
-  "https:task-manage-app-frontend.onrender.com"
+  "https://task-manage-app-frontend.onrender.com"
   ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
@@ -43,9 +43,8 @@ app.use("/tasks", taskRoutes);
 app.use((err: any, req: Request, res: Response, next: NextFunction) => {
   console.error("SERVER_ERROR:", err.stack);
   
-  // Hardcoded headers here as a safety net for crashes
-  res.header("Access-Control-Allow-Origin", "http://localhost:3000");
-  res.header("Access-Control-Allow-Credentials", "true");
+  // Remove the hardcoded res.header line entirely. 
+  // The cors() middleware at the top already handles this for you!
 
   res.status(err.status || 500).json({
     message: err.message || "Internal Server Error",
