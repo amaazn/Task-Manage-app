@@ -1,6 +1,5 @@
 # 📂 TaskFlow
 
-### *A Production-Grade, Secure Full-Stack Task Management Application*
 <p align="center"><strong><em>A Production-Grade, Secure Full-Stack Task Management Application</em></strong></p>
 
 <br/>
