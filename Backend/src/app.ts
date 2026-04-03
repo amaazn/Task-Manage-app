@@ -11,7 +11,9 @@ const app = express();
 // Place this at the very top. The cors() middleware handles OPTIONS 
 // automatically for all routes, so we don't need app.options anymore.
 const corsOptions = {
-  origin: "http://localhost:3000",
+  origin: ["http://localhost:3000",
+  "https:task-manage-app-frontend.onrender.com"
+  ],
   credentials: true,
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
