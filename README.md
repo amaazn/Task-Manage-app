@@ -4,8 +4,18 @@
 
 <br/>
 
-[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Visit%20App-4CAF50?style=for-the-badge&logoColor=white)](https://task-manage-app-frontend.onrender.com)
-&nbsp;
+<div align="center">
+
+[![Live Demo](https://img.shields.io/badge/🚀%20LIVE%20DEMO-VISIT%20APP%20NOW-4CAF50?style=for-the-badge&logo=rocket&logoColor=white)](https://task-manage-app-frontend.onrender.com)
+
+<br/>
+
+**Built to impress. Engineered to scale. Designed to ship.**
+
+TaskFlow is a production-ready task management system designed to handle real-world workflows. Moving beyond a simple CRUD tutorial, this application implements a **hardened backend architecture**, **dual-token JWT authentication**, and **end-to-end type safety**. It addresses the core needs of secure personal task management with a focus on performance, data integrity, and clean UX.
+
+</div>
+<br/>
 [![Next.js](https://img.shields.io/badge/Next.js-15-000000?style=for-the-badge&logo=next.js&logoColor=white)](https://nextjs.org/)
 &nbsp;
 [![TypeScript](https://img.shields.io/badge/TypeScript-Full%20Stack-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
