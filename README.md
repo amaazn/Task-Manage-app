@@ -99,15 +99,15 @@
 │                  REST API — Render Web Service                   │
 │               Node.js  +  Express  +  TypeScript                 │
 │                                                                  │
-│   ┌─────────────────┐   ┌─────────────────┐   ┌──────────────┐  │
-│   │  Auth Routes    │   │  Task Routes    │   │  Zod Schema  │  │
-│   │ /auth/register  │   │ GET  /tasks     │   │  Validation  │  │
-│   │ /auth/login     │   │ POST /tasks     │   │  Middleware  │  │
-│   │ /auth/refresh   │   │ PATCH/DELETE    │   │              │  │
-│   │ /auth/logout    │   │ /tasks/:id      │   │  + Custom    │  │
-│   └────────┬────────┘   │ /tasks/:id/     │   │  Error       │  │
+│   ┌─────────────────┐   ┌─────────────────┐   ┌──────────────┐   │
+│   │  Auth Routes    │   │  Task Routes    │   │  Zod Schema  │   │
+│   │ /auth/register  │   │ GET  /tasks     │   │  Validation  │   │
+│   │ /auth/login     │   │ POST /tasks     │   │  Middleware  │   │
+│   │ /auth/refresh   │   │ PATCH/DELETE    │   │              │   │
+│   │ /auth/logout    │   │ /tasks/:id      │   │  + Custom    │   │
+│   └────────┬────────┘   │ /tasks/:id/     │   │  Error       │   │
 │            │            │  toggle         │   │  Parser 🔑   │  │
-│            └────────────┴────────┬────────┴───┴──────────────┘  │
+│            └────────────┴────────┬────────┴───┴──────────────┘   │
 │                                  ▼                               │
 │                     ┌─────────────────────┐                      │
 │                     │     Prisma ORM      │                      │
